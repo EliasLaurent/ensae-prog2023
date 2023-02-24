@@ -8,7 +8,7 @@ class Graph:
         We will usually use a list of integers 1, ..., n.
     graph: dict
         A dictionnary that contains the adjacency list of each node in the form
-        graph[node] = [(neighbor1, p1, d1), (neighbor1, p1, d1), ...]
+        graph[node] = [(neighbor1, p1, d1), (neighbor2, p2, d2), ...]
         where p1 is the minimal power on the edge (node, neighbor1) and d1 is the distance on the edge
     nb_nodes: int
         The number of nodes.
@@ -73,16 +73,28 @@ class Graph:
         raise NotImplementedError
     
 
-    def connected_components(self):
-        raise NotImplementedError
-
-
-    def connected_components_set(self):
-        """
-        The result should be a set of frozensets (one per component), 
-        For instance, for network01.in: {frozenset({1, 2, 3}), frozenset({4, 5, 6, 7})}
-        """
-        return set(map(frozenset, self.connected_components()))
+    """def comp(self,l,lb,lv):
+        if lv==[]:
+            return(l,lb)
+        else:   
+            i=lv.pop()
+            if lb[i-1]:
+                lb[i-1]=False
+                b=[a for (a,a2,a3) in self.graph[i]]
+                l.append(i)
+                lv+=b
+            return(self.comp(l,lb,lv))
+            
+    def compco(self):
+        n=self.nb_nodes
+        lb=[True for i in range(n)]
+        c=[]
+        for k in range(1,n+1):
+            l1,l2=self.comp([],lb,[k])
+            lb=l2
+            if l1!=[]:
+                c.append(l1)
+        return(c)​"""
     
     def min_power(self, src, dest):
         """
@@ -91,26 +103,38 @@ class Graph:
         raise NotImplementedError
 
 
+    def CCsommet(self,i):
+        n=len(self.nodes)
+        L=[]
+        compconn=[0 for  _ in range(n)]
+        compconn[i-1]=1
+        L+=self.graph[i]
+        while L!=[]:
+            voisin = L.pop(0)
+            if compconn[voisin[0]-1]==0 :
+                compconn[voisin[0]-1]=1
+                L+=self.graph[voisin[0]] #ajout dans L des voisins de voisin
+        return(compconn)
+    def CConnexes(self):
+        L=[]
+        for i in self.nodes:
+            L.append(self.CCsommet(i))
+        Lsansdouble = [] 
+        for i in L : 
+            if i not in Lsansdouble: 
+                Lsansdouble.append(i) 
+        return(Lsansdouble)
+#3
+    def get_path_with_power(self,p,t):
+        i,j=t[0],t[1]
+        n=self.nb_nodes()
+        visit=[0 for _ in range(n)]
+        cc=self.compco()
+        for c in cc:
+            if c.count(i)==1:
+                if c.count(j)==0:
+                    return None
 def graph_from_file(filename):
-    """
-    Reads a text file and returns the graph as an object of the Graph class.
-
-    The file should have the following format: 
-        The first line of the file is 'n m'
-        The next m lines have 'node1 node2 power_min dist' or 'node1 node2 power_min' (if dist is missing, it will be set to 1 by default)
-        The nodes (node1, node2) should be named 1..n
-        All values are integers.
-
-    Parameters: 
-    -----------
-    filename: str
-        The name of the file
-
-    Outputs: 
-    -----------
-    g: Graph
-        An object of the class Graph with the graph from file_name.
-    """
     with open(filename, "r") as file:
         n, m = map(int, file.readline().split())
         g = Graph(range(1, n+1))
@@ -125,3 +149,9 @@ def graph_from_file(filename):
             else:
                 raise Exception("Format incorrect")
     return g
+
+        
+        
+
+
+#TD2
